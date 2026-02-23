@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur PRO++ Tuya – Plan Chantier</title>
+
+<style>
+body{
+    font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+    background:#f2f4f7;
+    margin:0;
+    padding:12px;
+}
+h1{font-size:22px;margin:10px 0;}
+h2{font-size:18px;margin-top:25px;}
+.box{
+    background:#fff;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+    box-shadow:0 1px 5px rgba(0,0,0,.08);
+}
+label{display:block;margin:6px 0;}
+input{
+    width:100%;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:16px;
+}
+button{
+    margin-top:10px;
+    padding:12px;
+    width:100%;
+    border:none;
+    border-radius:10px;
+    background:#007aff;
+    color:white;
+    font-size:16px;
+    font-weight:600;
+}
+.check{margin-right:8px;}
+.small{font-size:13px;color:#555}
+</style>
+</head>
+
+<body>
+
+<h1>🧠 Générateur PRO++ – Installation Tuya</h1>
+
+<div class="box">
+<h2>1️⃣ Pièces de la maison</h2>
+
+<div id="rooms"></div>
+
+<button onclick="addRoom()">➕ Ajouter une pièce</button>
+<button onclick="generate()">⚙️ Générer plan chantier</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+let roomCount = 0;
+
+function addRoom(){
+    roomCount++;
+    const div = document.createElement("div");
+    div.className = "box";
+    div.innerHTML = `
+        <h3>Pièce ${roomCount}</h3>
+        <label>Nom de la pièce :
+        <input id="name${roomCount}" placeholder="Salon, Cuisine, Chambre..."></label>
+
+        <label>Nombre de volets :
+        <input type="number" id="v${roomCount}" value="0" min="0"></label>
+
+        <label>Nombre de baies :
+        <input type="number" id="b${roomCount}" value="0" min="0"></label>
+    `;
+    document.getElementById("rooms").appendChild(div);
+}
+
+function generate(){
+
+let html = "";
+let o = 1;
+let f = 1;
+let b = 1;
+let bf = 1;
+
+html += `<div class="box"><h2>2️⃣ Nommage des volets</h2>`;
+
+for(let i=1;i<=roomCount;i++){
+    const name = document.getElementById("name"+i).value || "Pièce "+i;
+    const v = parseInt(document.getElementById("v"+i).value);
+    const ba = parseInt(document.getElementById("b"+i).value);
+
+    for(let j=1;j<=v;j++){
+        html += `<div>✔ Volet – ${name} ${j}</div>`;
+    }
+    for(let j=1;j<=ba;j++){
+        html += `<div>✔ Baie – ${name} ${j}</div>`;
+    }
+}
+html += `</div>`;
+
+html += `<div class="box"><h2>3️⃣ Scènes internes</h2>`;
+
+for(let i=1;i<=roomCount;i++){
+    const name = document.getElementById("name"+i).value || "Pièce "+i;
+    const v = parseInt(document.getElementById("v"+i).value);
+    const ba = parseInt(document.getElementById("b"+i).value);
+
+    for(let j=1;j<=v;j++){
+        html += `<label><input type="checkbox" class="check"> O${o} – Volet – ${name} ${j} → Ouvrir</label>`;
+        html += `<label><input type="checkbox" class="check"> F${f} – Volet – ${name} ${j} → Fermer</label>`;
+        o++; f++;
+    }
+
+    for(let j=1;j<=ba;j++){
+        html += `<label><input type="checkbox" class="check"> B${b} – Baie – ${name} ${j} → Ouvrir</label>`;
+        html += `<label><input type="checkbox" class="check"> BF${bf} – Baie – ${name} ${j} → Fermer</label>`;
+        b++; bf++;
+    }
+}
+
+html += `</div>`;
+
+html += `<div class="box"><h2>4️⃣ Automatisations</h2>
+<label><input type="checkbox" class="check"> Lever du soleil → O + B</label>
+<label><input type="checkbox" class="check"> Coucher du soleil → F + BF</label>
+<label><input type="checkbox" class="check"> Mode Nuit → F + BF</label>
+</div>`;
+
+html += `<div class="box"><h2>5️⃣ Scènes visibles client</h2>
+<label><input type="checkbox" class="check"> Mode Normal</label>
+<label><input type="checkbox" class="check"> Mode Vacances</label>
+<label><input type="checkbox" class="check"> Mode Nuit</label>
+<label><input type="checkbox" class="check"> Je pars</label>
+</div>`;
+
+html += `<div class="box"><h2>6️⃣ Checklist chantier</h2>
+<label><input type="checkbox" class="check"> Modules appairés</label>
+<label><input type="checkbox" class="check"> Nommage OK</label>
+<label><input type="checkbox" class="check"> Scènes créées</label>
+<label><input type="checkbox" class="check"> Automatisations créées</label>
+<label><input type="checkbox" class="check"> Tests ouverture</label>
+<label><input type="checkbox" class="check"> Tests fermeture</label>
+<label><input type="checkbox" class="check"> Test Mode Nuit</label>
+</div>`;
+
+document.getElementById("result").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
